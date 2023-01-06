@@ -13,7 +13,14 @@ const router = new express.Router();
 /** Homepage: show list of customers. */
 
 router.get("/", async function (req, res, next) {
-  const customers = await Customer.all();
+  let customers;
+
+  if (req.query.search) {
+    customers = await Customer.findAny(req.query.search)
+  } else {
+    customers = await Customer.all();
+  }
+
   return res.render("customer_list.html", { customers });
 });
 
@@ -24,6 +31,7 @@ router.get("/add/", async function (req, res, next) {
 });
 
 /** Handle adding a new customer. */
+// form inputs are accessible through req.body
 
 router.post("/add/", async function (req, res, next) {
   if (req.body === undefined) {
@@ -36,7 +44,7 @@ router.post("/add/", async function (req, res, next) {
   return res.redirect(`/${customer.id}/`);
 });
 
-/** Show a customer, given their ID. */
+/** Show customer detail page, given their ID. */
 
 router.get("/:id/", async function (req, res, next) {
   const customer = await Customer.get(req.params.id);

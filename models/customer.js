@@ -56,6 +56,33 @@ class Customer {
     return new Customer(customer);
   }
 
+  /** searches for all customers that have a first or lastname
+   * matching the text */
+  static async findAny(text) {
+    // implement capitalize first letter maybe
+    const results = await db.query(
+      `SELECT id,
+              first_name AS "firstName",
+              last_name  AS "lastName",
+              phone,
+              notes
+        FROM customers
+        WHERE first_name = $1
+        OR last_name = $1`,
+      [text],
+    );
+
+    debugger;
+
+    if (results.rows[0] === undefined) {
+      const err = new Error(`No such customer with name including ${text}`);
+      err.status = 404;
+      throw err;
+    }
+
+    return results.rows.map(c => new Customer(c));
+  }
+
   /** get all reservations for this customer. */
 
   async getReservations() {
@@ -89,6 +116,11 @@ class Customer {
           ],
       );
     }
+  }
+
+  /** returns full name of customer */
+  getFullName() {
+    return `${this.firstName} ${this.lastName}`
   }
 }
 
