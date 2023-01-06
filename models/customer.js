@@ -72,8 +72,6 @@ class Customer {
       [text],
     );
 
-    debugger;
-
     if (results.rows[0] === undefined) {
       const err = new Error(`No such customer with name including ${text}`);
       err.status = 404;
@@ -83,11 +81,35 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
+  /** Query for list of customers by number of reservations and return top 10
+   * customers with most reservations
+   */
+  static async getBestCustomers() {
+    const results = await db.query(
+      `SELECT c.id,
+              c.first_name AS "firstName",
+              c.last_name  AS "lastName",
+              c.phone,
+              c.notes,
+              COUNT(r.id) AS res_number
+        FROM customers AS c
+        LEFT JOIN reservations AS r
+          ON r.customer_id = c.id
+        GROUP BY c.id
+        ORDER BY COUNT(r.id) DESC;`
+    )
+
+
+    console.log("results.rows", results.rows.slice(0, 10).map(c => new Customer(c)));
+
+  }
+
   /** get all reservations for this customer. */
 
   async getReservations() {
     return await Reservation.getReservationsForCustomer(this.id);
   }
+
 
   /** save this customer. */
 
