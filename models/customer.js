@@ -59,8 +59,8 @@ class Customer {
 
   /** searches for all customers that have a first or lastname
    * matching the text */
+  // TODO: returns records even when first AND last names are entered
   static async findAny(text) {
-    // implement capitalize first letter maybe
     const results = await db.query(
       `SELECT id,
               first_name AS "firstName",
@@ -69,9 +69,12 @@ class Customer {
               notes
         FROM customers
         WHERE first_name LIKE $1
-        OR last_name LIKE $1`,
+        OR last_name LIKE $1
+        OR CONCAT(first_name, ' ', last_name) LIKE $1`,
       [text],
     );
+    // ILIKE -- %%
+    // ORDER BY -- first and last name
 
     if (results.rows[0] === undefined) {
       const err = new Error(`No such customer with name including ${text}`);
@@ -94,12 +97,12 @@ class Customer {
               c.notes,
               COUNT(r.id) AS res_number
         FROM customers AS c
-        LEFT JOIN reservations AS r
+        JOIN reservations AS r
           ON r.customer_id = c.id
         GROUP BY c.id
         ORDER BY COUNT(r.id) DESC;`
     )
-
+    // LIMIT to 10, so you dont need to slice
     return results.rows.slice(0, 10).map(c => new Customer(c));
   }
 

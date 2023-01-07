@@ -29,7 +29,6 @@ router.get("/top-ten/", async function (req, res, next) {
 
   const customers = await Customer.getBestCustomers();
   console.log("customers", customers);
-  debugger;
 
   return res.render("customer_list.html", { customers });
 });
@@ -94,6 +93,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   if (req.body === undefined) {
     throw new BadRequestError();
   }
+
   const customerId = req.params.id;
   const startAt = new Date(req.body.startAt);
   const numGuests = req.body.numGuests;
@@ -105,9 +105,11 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
     numGuests,
     notes,
   });
+
   await reservation.save();
 
   return res.redirect(`/${customerId}/`);
 });
+
 
 module.exports = router;
