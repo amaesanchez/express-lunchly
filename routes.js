@@ -5,7 +5,6 @@
 const express = require("express");
 
 const { BadRequestError } = require("./expressError");
-const { getBestCustomers } = require("./models/customer");
 const Customer = require("./models/customer");
 const Reservation = require("./models/reservation");
 
@@ -15,7 +14,7 @@ const router = new express.Router();
 
 router.get("/", async function (req, res, next) {
   let customers;
-  // console.log(await Customer.getBestCustomers());
+
   if (req.query.search) {
     customers = await Customer.findAny(req.query.search);
   } else {
@@ -26,14 +25,13 @@ router.get("/", async function (req, res, next) {
 });
 
 /** Gets list of best customers and injects to customer_list */
-router.get("/topten/", async function (req, res, next) {
+router.get("/top-ten/", async function (req, res, next) {
 
   const customers = await Customer.getBestCustomers();
   console.log("customers", customers);
-
+  debugger;
 
   return res.render("customer_list.html", { customers });
-
 });
 
 /** Form to add a new customer. */
@@ -111,9 +109,5 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
 
   return res.redirect(`/${customerId}/`);
 });
-
-
-
-
 
 module.exports = router;

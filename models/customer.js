@@ -28,6 +28,7 @@ class Customer {
            FROM customers
            ORDER BY last_name, first_name`,
     );
+
     return results.rows.map(c => new Customer(c));
   }
 
@@ -67,8 +68,8 @@ class Customer {
               phone,
               notes
         FROM customers
-        WHERE first_name = $1
-        OR last_name = $1`,
+        WHERE first_name LIKE $1
+        OR last_name LIKE $1`,
       [text],
     );
 
@@ -99,9 +100,7 @@ class Customer {
         ORDER BY COUNT(r.id) DESC;`
     )
 
-
-    console.log("results.rows", results.rows.slice(0, 10).map(c => new Customer(c)));
-
+    return results.rows.slice(0, 10).map(c => new Customer(c));
   }
 
   /** get all reservations for this customer. */
